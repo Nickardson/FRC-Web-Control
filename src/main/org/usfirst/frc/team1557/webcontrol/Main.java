@@ -1,9 +1,18 @@
 package org.usfirst.frc.team1557.webcontrol;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.networktables.NetworkTableProvider;
+import edu.wpi.first.wpilibj.networktables2.NetworkTableEntry;
+import edu.wpi.first.wpilibj.networktables2.client.NetworkTableClient;
+import edu.wpi.first.wpilibj.networktables2.type.ComplexData;
+import edu.wpi.first.wpilibj.networktables2.type.NumberArray;
+import edu.wpi.first.wpilibj.networktables2.util.List;
+import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.wpilibj.tables.ITableListener;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.prefs.Preferences;
 
@@ -31,15 +40,26 @@ public class Main {
         NetworkTable.setClientMode();
         NetworkTable.setIPAddress(host);
 
-        NetworkTable table = NetworkTable.getTable("SmartDashboard");
+        final String TABLE_NAME = "SmartDashboard";
+
+        NetworkTable table = NetworkTable.getTable(TABLE_NAME);
+
+        // Start file server
+        // TODO: allow bind to other IPs, for intentional access from other computers.
+        final FileServer fs = new FileServer("localhost", 8888);
+        fs.start();
+
+        // Send a message to everybody when table is updated
+        table.addTableListener(new ITableListener() {
+            @Override
+            public void valueChanged(ITable source, String key, Object value, boolean isNew) {
+                fs.sendNetworkTableToAll(NetworkTableWSHandler.createUpdateMessage("/" + TABLE_NAME  + "/" + key, isNew, value));
+            }
+        });
 
         // Put Start time
         table.putString("FRCwc-Start", new Date().toString());
 
-        // Start file server
-        // TODO: allow bind to other IPs, for intentional access from other computers.
-        FileServer fs = new FileServer("localhost", 8888);
-        fs.start();
         fs.join();
     }
 }

@@ -10,9 +10,59 @@
 
 		<script src="js/ws.js"></script>
 		<script>
+		var ns = {};
+
+		/**
+		 * Splits a string into at most {count} different values.
+		 * Any values that would have been split past the last one will instead be part of the last one.
+		 * @example
+		 * splitMax("A:B:C", ":", 2) // == ["A", "B:C"]
+		 * splitMax("A:B:C:D:E", ":", 3) // == ["A", "B", "C:D:E"]
+		 * @param  {String} str   The string to split
+		 * @param  {String} sep   The separator
+		 * @param  {Number} count The maximum number of strings to return
+		 * @return {Array[String]}       An array of the split strings.
+		 */
+		function splitMax(str, sep, count) {
+			var ls = str.split(sep);
+
+			for (var i = count; i < ls.length; i++) {
+				ls[count - 1] += sep + ls[i];
+			}
+
+			return ls.splice(0, count);
+		}
+
+		ns.NetworkTable = function (message) {
+			var s = splitMax(message, ";", 4);
+
+			var key = s[0],
+				isNew = s[1],
+				type = s[2],
+				value = s[3];
+
+			console.log(key, isNew, type, value);
+		};
+
+		/**
+		 * Messages should be in the form
+		 * NameSpace:Message
+		 * @param  {[type]} e The event
+		 */
 		socket.addEventListener("message", function (m) {
-			console.log("Got a message", m.data);
+			var ind = m.data.indexOf(":");
+			var namespace = m.data.substring(0, ind);
+			var message = m.data.substring(ind + 1);
+
+			if (ns[namespace]) {
+				ns[namespace](message, namespace);
+			}
 		});
+
+		socket.addEventListener("open", function (m) {
+			socket.send("FullUpdate:false");
+		});
+
 		</script>
 	</body>
 </html>

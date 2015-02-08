@@ -2,22 +2,29 @@ package org.usfirst.frc.team1557.webcontrol;
 
 import fi.iki.elonen.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 public class FileServer extends NanoHTTPD {
 
-    WebSocketResponseHandler responseHandler;
+    NetworkTableWSHandler wsResponse;
 
     public FileServer(String host, int port) {
         super(host, port);
 
-        responseHandler = new WebSocketResponseHandler(webSocketFactory);
+        wsResponse = new NetworkTableWSHandler();
+    }
+
+    /**
+     * Sends a message to all clients listening to NetworkTable websockets.
+     * @param message Message to send to each client
+     */
+    public void sendNetworkTableToAll(String message) {
+        wsResponse.sendToAll(message);
     }
 
     @Override
     public Response serve(IHTTPSession session) {
-        Response ws = responseHandler.serve(session);
+        Response ws = wsResponse.serve(session);
 
         // If ws is null, then request is not Websocket related, otherwise it is a WebSocket object.
         if (ws == null) {
@@ -40,49 +47,5 @@ public class FileServer extends NanoHTTPD {
         }
 
         return ws;
-    }
-
-    IWebSocketFactory webSocketFactory = new IWebSocketFactory() {
-        @Override
-        public WebSocket openWebSocket(IHTTPSession handshake) {
-            return new Ws(handshake);
-        }
-    };
-
-    class Ws extends WebSocket {
-        public Ws(IHTTPSession handshakeRequest) {
-            super(handshakeRequest);
-            System.out.println("WS Connect: " + handshakeRequest.getUri());
-        }
-
-        @Override
-        protected void onPong(WebSocketFrame pongFrame) {
-
-        }
-
-        @Override
-        protected void onMessage(WebSocketFrame messageFrame) {
-            // Ignore ping messages
-            if (messageFrame.getTextPayload().length() == 0) {
-                return;
-            }
-
-            System.out.println("Message : " + messageFrame.getTextPayload());
-            try {
-                send("Response to " + messageFrame.getTextPayload());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        protected void onClose(WebSocketFrame.CloseCode code, String reason, boolean initiatedByRemote) {
-            System.out.println("WS Disconnected: " + code.name() + " : " + code.getValue() + " because " + reason);
-        }
-
-        @Override
-        protected void onException(IOException e) {
-            System.out.println(e.getMessage());
-        }
     }
 }
