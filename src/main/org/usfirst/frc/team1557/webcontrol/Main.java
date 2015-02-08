@@ -10,7 +10,16 @@ import java.util.Date;
 import java.util.prefs.Preferences;
 
 public class Main {
+    public static boolean HTML_FILES = false;
+
     public static void main(String[] args) throws IOException {
+        for (String arg : args) {
+            if (arg.equals("-files")) {
+                System.out.println("-files: Using files instead of classpath for http resources.");
+                HTML_FILES = true;
+            }
+        }
+
         Preferences preferences = Preferences.userNodeForPackage(Main.class);
 
         // Prompt for NetworkTable hostname

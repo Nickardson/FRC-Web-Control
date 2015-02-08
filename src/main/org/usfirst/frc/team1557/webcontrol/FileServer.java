@@ -2,6 +2,9 @@ package org.usfirst.frc.team1557.webcontrol;
 
 import fi.iki.elonen.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class FileServer extends NanoHTTPD {
@@ -30,6 +33,10 @@ public class FileServer extends NanoHTTPD {
         if (ws == null) {
             String uri = session.getUri();
 
+            if (uri.contains("../")) {
+                return new Response(Response.Status.FORBIDDEN, MIME_PLAINTEXT, "Will not serve ../ for security reasons");
+            }
+
             if (uri.equals("/")) {
                 uri += "index.html";
             }
@@ -37,7 +44,17 @@ public class FileServer extends NanoHTTPD {
             // Serve resources from inside the http package bundled with the jar.
             uri = "/http" + uri;
 
-            InputStream stream = getClass().getResourceAsStream(uri);
+            InputStream stream = null;
+            if (Main.HTML_FILES) {
+                try {
+                    File newFile = new File("src/resources" + uri);
+                    stream = new FileInputStream(newFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                stream = getClass().getResourceAsStream(uri);
+            }
 
             if (stream == null) {
                 return new Response(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found: " + uri);
