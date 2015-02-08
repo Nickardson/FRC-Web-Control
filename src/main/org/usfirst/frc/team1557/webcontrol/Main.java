@@ -1,9 +1,42 @@
 package org.usfirst.frc.team1557.webcontrol;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+
+import javax.swing.*;
 import java.io.IOException;
+import java.util.Date;
+import java.util.prefs.Preferences;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        Preferences preferences = Preferences.userNodeForPackage(Main.class);
+
+        // Prompt for NetworkTable hostname
+        String host = JOptionPane.showInputDialog(
+                "What hostname is the NetworkTable under?\n\n" +
+                "Robots will likely use a host name similar to 'roboRIO-1234.local' where 1234 is your team number.\n" +
+                "Local NetworkTable servers can be accessed with 'localhost'\n" +
+                "An IP can also be provided.",
+                preferences.get("host", "roboRIO-1234.local"));
+
+        // Quit if cancelled or no host provided
+        if (host == null || host.length() == 0) {
+            return;
+        } else {
+            // If host is provided, store in preferences
+            preferences.put("host", host);
+        }
+
+        // Initialize NetworkTable
+        NetworkTable.setClientMode();
+        NetworkTable.setIPAddress(host);
+
+        NetworkTable table = NetworkTable.getTable("SmartDashboard");
+
+        // Put Start time
+        table.putString("FRCwc-Start", new Date().toString());
+
+        // Start file server
         // TODO: allow bind to other IPs, for intentional access from other computers.
         FileServer fs = new FileServer("localhost", 8888);
         fs.start();
