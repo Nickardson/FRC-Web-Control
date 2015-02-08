@@ -3,67 +3,132 @@
 	<head>
 		<title>FRC Web Control</title>
 
-		<link rel="stylesheet" href="style.css"/>
+		<link rel="stylesheet" href="css/jquery.gridster.css"/>
+		<link rel="stylesheet" href="css/style.css"/>
 	</head>
 	<body>
-		Hello World!
+		<button id="drag-btn">Not Draggable/Resizable</button>
+
+		<div class="gridster">
+		    <ul>
+		        <!--<li data-row="1" data-col="6" data-sizex="1" data-sizey="2"></li>-->
+		    </ul>
+		</div>
 
 		<script src="js/jquery-1.11.2.min.js"></script>
+		<script src="js/jquery.gridster.min.js"></script>
 		<script src="js/ws.js"></script>
 		<script>
-		var ns = {};
 
-		/**
-		 * Splits a string into at most {count} different values.
-		 * Any values that would have been split past the last one will instead be part of the last one.
-		 * @example
-		 * splitMax("A:B:C", ":", 2) // == ["A", "B:C"]
-		 * splitMax("A:B:C:D:E", ":", 3) // == ["A", "B", "C:D:E"]
-		 * @param  {String} str   The string to split
-		 * @param  {String} sep   The separator
-		 * @param  {Number} count The maximum number of strings to return
-		 * @return {Array[String]}       An array of the split strings.
-		 */
-		function splitMax(str, sep, count) {
-			var ls = str.split(sep);
+		$(function(){ //DOM Ready
+ 
+		    var gridster = $(".gridster ul").gridster({
+		        widget_margins: [3, 3],
+		        widget_base_dimensions: [100, 50],
+		        
+		        resize: {
+		        	enabled: true
+		        },
 
-			for (var i = count; i < ls.length; i++) {
-				ls[count - 1] += sep + ls[i];
+		        serialize_params: function($w, wgd) {
+		        	return {
+		        		col: wgd.col,
+		        		row: wgd.row,
+		        		size_x: wgd.size_x,
+		        		size_y: wgd.size_y
+		        	};
+		        }
+		    }).data('gridster');
+
+		    gridster.disable();
+		    gridster.disable_resize();
+
+		    // Button to toggle move/resize
+		    var draggable = false;
+		    $('#drag-btn').click(function () {
+		    	draggable = !draggable;
+
+		    	if (draggable) {
+		    		gridster.enable();
+		    		gridster.enable_resize();
+		    		$(this).html("Draggable/Resizable");
+		    	} else {
+		    		gridster.disable();
+		    		gridster.disable_resize();
+		    		$(this).html("Not Draggable/Resizable");
+		    	}
+		    });
+
+			var ns = {};
+
+			/**
+			 * Splits a string into at most {count} different values.
+			 * Any values that would have been split past the last one will instead be part of the last one.
+			 * @example
+			 * splitMax("A:B:C", ":", 2) // == ["A", "B:C"]
+			 * splitMax("A:B:C:D:E", ":", 3) // == ["A", "B", "C:D:E"]
+			 * @param  {String} str   The string to split
+			 * @param  {String} sep   The separator
+			 * @param  {Number} count The maximum number of strings to return
+			 * @return {Array[String]}       An array of the split strings.
+			 */
+			function splitMax(str, sep, count) {
+				var ls = str.split(sep);
+
+				for (var i = count; i < ls.length; i++) {
+					ls[count - 1] += sep + ls[i];
+				}
+
+				return ls.splice(0, count);
 			}
 
-			return ls.splice(0, count);
-		}
+			var widgets = {
 
-		ns.NetworkTable = function (message) {
-			var s = splitMax(message, ";", 4);
+			};
 
-			var key = s[0],
-				isNew = s[1],
-				type = s[2],
-				value = s[3];
+			ns.NetworkTable = function (message) {
+				var s = splitMax(message, ";", 4);
 
-			console.log(key, isNew, type, value);
-		};
+				var key = s[0],
+					isNew = s[1],
+					type = s[2],
+					value = s[3];
 
-		/**
-		 * Messages should be in the form
-		 * NameSpace:Message
-		 * @param  {[type]} e The event
-		 */
-		socket.addEventListener("message", function (m) {
-			var ind = m.data.indexOf(":");
-			var namespace = m.data.substring(0, ind);
-			var message = m.data.substring(ind + 1);
+				var w = widgets[key];
 
-			if (ns[namespace]) {
-				ns[namespace](message, namespace);
-			}
+				// Create widget if none exists
+				if (w === undefined) {
+					var el = $('<li class="new"><div class="widget-container"><h4>' + key + '</h4><span class="nettable-widget"></span></div></li>');
+					widgets[key] = w = gridster.add_widget(el, 3, 1);
+				}
+
+				// Update the value
+				w.find('.nettable-widget').html(value);
+
+				console.log(key, isNew, type, value);
+			};
+
+			/**
+			 * Messages should be in the form
+			 * NameSpace:Message
+			 * @param  {[type]} e The event
+			 */
+			socket.addEventListener("message", function (m) {
+				var ind = m.data.indexOf(":");
+				var namespace = m.data.substring(0, ind);
+				var message = m.data.substring(ind + 1);
+
+				if (ns[namespace]) {
+					ns[namespace](message, namespace);
+				}
+			});
+
+			// Request a full update upon startup
+			socket.addEventListener("open", function (m) {
+				socket.send("FullUpdate:false");
+			});
+
 		});
-
-		socket.addEventListener("open", function (m) {
-			socket.send("FullUpdate:false");
-		});
-
 		</script>
 	</body>
 </html>

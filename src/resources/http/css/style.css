@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgb(39, 39, 39);
+    color: white;
+}
+
+.gridster {
+    margin: 0 auto;
+}
+
+.gridster * {
+	margin:0;
+	padding:0;
+
+}
+
+.gridster>ul {
+	list-style-type: none;
+}
+
+.gridster>ul>li {
+	text-align: center;
+	background-color: #21475F;
+	box-shadow: 0 0 5px rgba(0,0,0,0.3);
+	overflow: hidden;
+}
+
+.widget-container {
+	padding: 5px;
+}
