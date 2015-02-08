@@ -36,7 +36,7 @@ public class FileServer extends NanoHTTPD {
                 return new Response(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found: " + uri);
             }
 
-            return new Response(Response.Status.OK, MIME_HTML, stream);
+            return new Response(Response.Status.OK, SimpleWebServer.getMimeTypeForFile(uri), stream);
         }
 
         return ws;

@@ -437,7 +437,7 @@ public class SimpleWebServer extends NanoHTTPD {
     }
 
     // Get MIME type from file name extension, if possible
-    private String getMimeTypeForFile(String uri) {
+    public static String getMimeTypeForFile(String uri) {
         int dot = uri.lastIndexOf('.');
         String mime = null;
         if (dot >= 0) {
