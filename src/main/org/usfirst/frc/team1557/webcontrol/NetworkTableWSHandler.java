@@ -74,17 +74,21 @@ public class NetworkTableWSHandler extends WebSocketResponseHandler {
                 String namespace = text.substring(0, text.indexOf(':'));
                 String message = text.substring(text.indexOf(':') + 1);
 
+                // Client requests a full update
                 if (namespace.equals("FullUpdate")) {
                     try {
+                        // Get the current NetworkTableProvider
                         Field field = NetworkTable.class.getDeclaredField("staticProvider");
                         field.setAccessible(true);
                         NetworkTableProvider staticProvider = (NetworkTableProvider) field.get(null);
+
+                        // Get and send each key/value pair for all tables
                         edu.wpi.first.wpilibj.networktables2.util.List keys = staticProvider.getNode().getEntryStore().keys();
                         for (int i = 0; i < keys.size(); i++) {
-                            System.out.println("KEY: " + keys.get(i));
-                            NetworkTableEntry entry = staticProvider.getNode().getEntryStore().getEntry((String) keys.get(i));
+                            String key = (String) keys.get(i);
 
-                            send(createUpdateMessage((String) keys.get(i), true, entry.getValue()));
+                            NetworkTableEntry entry = staticProvider.getNode().getEntryStore().getEntry(key);
+                            send(createUpdateMessage(key, true, entry.getValue()));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -92,12 +96,7 @@ public class NetworkTableWSHandler extends WebSocketResponseHandler {
                 }
             }
 
-            System.out.println("Message : " + text);
-            try {
-                send("Response:" + text);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Message: " + text);
         }
 
         @Override
