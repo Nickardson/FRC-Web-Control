@@ -1,18 +1,11 @@
 package org.usfirst.frc.team1557.webcontrol;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.networktables.NetworkTableProvider;
-import edu.wpi.first.wpilibj.networktables2.NetworkTableEntry;
-import edu.wpi.first.wpilibj.networktables2.client.NetworkTableClient;
-import edu.wpi.first.wpilibj.networktables2.type.ComplexData;
-import edu.wpi.first.wpilibj.networktables2.type.NumberArray;
-import edu.wpi.first.wpilibj.networktables2.util.List;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.prefs.Preferences;
 
@@ -53,7 +46,7 @@ public class Main {
         table.addTableListener(new ITableListener() {
             @Override
             public void valueChanged(ITable source, String key, Object value, boolean isNew) {
-                fs.sendNetworkTableToAll(NetworkTableWSHandler.createUpdateMessage("/" + TABLE_NAME  + "/" + key, isNew, value));
+                fs.sendNetworkTableToAll(NetworkTableWSHandler.createUpdateMessage("/" + TABLE_NAME + "/" + key, isNew, value));
             }
         });
 
