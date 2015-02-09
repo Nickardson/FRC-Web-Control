@@ -25,6 +25,24 @@ body {
 	overflow: hidden;
 }
 
+/* Disable pointer events, i.e. click by default */
 .widget-container {
 	padding: 5px;
+	pointer-events: none;
+	white-space: nowrap;
+}
+
+.gridster>ul>li {
+	cursor: move;
+}
+
+/* When resize is disabled, enable pointer events */
+.gs-resize-disabled .widget-container {
+	pointer-events: inherit;
+	cursor: inherit;
+}
+
+.gridster ul.gs-resize-disabled>li {
+	pointer-events: inherit;
+	cursor: inherit;
 }
