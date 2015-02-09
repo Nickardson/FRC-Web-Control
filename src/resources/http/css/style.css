@@ -4,25 +4,37 @@ body {
     color: white;
 }
 
-.gridster {
-    margin: 0 auto;
+#widgets {
+	position: absolute;
+	top: 20px;
+	bottom: 0px;
+	left: 0px;
+	right: 25%;
 }
 
-.gridster * {
-	margin:0;
-	padding:0;
-
+#datatree-container {
+	position: absolute;
+	top: 20px;
+	bottom: 0px;
+	width: 25%;
+	right: 0px;
 }
 
-.gridster>ul {
-	list-style-type: none;
-}
-
-.gridster>ul>li {
+.widget {
+	padding: 2px;
 	text-align: center;
+	display: inline-block;
+}
+
+.widget-container {
 	background-color: #21475F;
 	box-shadow: 0 0 5px rgba(0,0,0,0.3);
 	overflow: hidden;
+}
+
+.widget-keyname {
+	margin: 0px 0px 10px 0px;
+	font-style: italic;
 }
 
 /* Disable pointer events, i.e. click by default */
@@ -45,4 +57,13 @@ body {
 .gridster ul.gs-resize-disabled>li {
 	pointer-events: inherit;
 	cursor: inherit;
+}
+
+.fancytree-ext-captioned-caption {
+	color: rgb(40, 40, 40);
+	font-style: italic;
+}
+
+.fancytree-ext-captioned-sep:before {
+	content: " = ";
 }

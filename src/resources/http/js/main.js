@@ -1,4 +1,5 @@
-require(['ws', 'grid', 'namespace', 'widget'], function (ws, grid, namespace, widget) {
+var tree;
+require(['ws', 'namespace', 'widget'], function (ws, namespace, widget) {
 	var socket = ws.connect("");
 
 	widget.add('java.lang.Double', {
@@ -58,18 +59,70 @@ require(['ws', 'grid', 'namespace', 'widget'], function (ws, grid, namespace, wi
 	});
 
 	$('#drag-btn').click(function () {
-		grid.toggleMovable();
+		/*grid.toggleMovable();
 
 		if (grid.isMovable()) {
 			$(this).html("Draggable/Resizable");
 		} else {
 			$(this).html("Not Draggable/Resizable");
-		}
+		}*/
 	});
 
-	var createdWidgets = {
+	var createdWidgets = {};
+	var createdTableRows = {};
 
-	};
+	tree = $("#datatree").fancytree({
+		source: [],
+		extensions: ['captioned'],
+		childcounter: {
+			deep: true,
+			hideZeros: false,
+			hideExpanded: false
+		},
+	});
+
+	tree = tree.fancytree('getTree').getRootNode();
+
+	function getTreeNode(node, title) {
+		var c = node.getChildren();
+
+		if (c) {
+			for (var i = 0; i < c.length; i++) {
+				if (c[i].title == title) {
+					return c[i];
+				}
+			}
+		}
+
+		return false;
+	}
+
+	function getKeyTree(key, value) {
+		var levels = key.substring(1).split("/");
+		var l = tree;
+
+		for (var i = 0; i < levels.length; i++) {
+			var el = getTreeNode(l, levels[i]);
+
+			if (el) {
+				l = el;
+			} else {
+				l = l.addChildren({
+					title: levels[i],
+					expanded: true,
+					folder: i != levels.length - 1,
+					caption: value
+				});
+
+				tree.sortChildren(null, true);
+			}
+		}
+
+		return l;
+	}
+
+	getKeyTree('/SmartDashboard/Subsystems/DriveTrain/x');
+	getKeyTree('/SmartDashboard/Subsystems/DriveTrain/y');
 
 	/**
 	 * Handles messages in the form:
@@ -85,22 +138,33 @@ require(['ws', 'grid', 'namespace', 'widget'], function (ws, grid, namespace, wi
 		var w = createdWidgets[key];
 		var wid = widget.get(type);
 
+		getKeyTree(key, value);
+
 		// Create widget if none exists
 		if (w === undefined) {
 			var keyName = key;
-			if (keyName.indexOf('/SmartDashboard/') == 0) {
+			if (keyName.indexOf('/SmartDashboard/') === 0) {
 				keyName = keyName.substr('/SmartDashboard/'.length);
 			}
-			var el = $('<li class="new"><div class="widget-container"><h4>' + keyName + '</h4><span class="nettable-widget"></span></div></li>');
+			var el = $('<div class="widget"><div class="widget-container"><h4 class="widget-keyname">' + keyName + '</h4><span class="nettable-widget"></span></div></div>');
 			
 			var widgetElement = el.find('.nettable-widget');
 			if (wid) {
 				widgetElement.data('key', key);
-				createdWidgets[key] = w = grid.gridster.add_widget(el, wid.cols || 3, wid.rows || 1);
+				//createdWidgets[key] = w = grid.gridster.add_widget(el, wid.cols || 3, wid.rows || 1);
+				createdWidgets[key] = w = el;
 				wid.init(widgetElement);
 			} else {
-				createdWidgets[key] = w = grid.gridster.add_widget(el, 3, 1);
+				//createdWidgets[key] = w = grid.gridster.add_widget(el, 3, 1);
+				createdWidgets[key] = w = el;
 			}
+			
+			el.appendTo('#widgets').draggable({
+				snap: true,
+				containment: 'parent'
+			}).resizable({
+				containment: 'parent'
+			});
 		}
 
 		// Update the value
@@ -108,6 +172,11 @@ require(['ws', 'grid', 'namespace', 'widget'], function (ws, grid, namespace, wi
 			wid.update(w.find('.nettable-widget'), value);
 		else
 			w.find('.nettable-widget').html(value);
+
+		var no = getKeyTree(key, value);
+		console.log(no, no.data, no.data.caption);
+		no.data.caption = value;
+		no.renderTitle();
 
 		w.find('.nettable-widget').data('value', value);
 
