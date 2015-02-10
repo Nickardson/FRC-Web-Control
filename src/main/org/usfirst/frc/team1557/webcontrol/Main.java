@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
 import javax.swing.*;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.prefs.Preferences;
@@ -15,6 +17,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         for (String arg : args) {
             if (arg.equals("-files")) {
+            	System.out.println(new File(".").getAbsolutePath());
                 System.out.println("-files: Using files instead of classpath for http resources.");
                 HTML_FILES = true;
             }
