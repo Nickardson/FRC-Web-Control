@@ -11,10 +11,6 @@ require(['ws', 'namespace', 'widget'], function (ws, namespace, widget) {
 				.appendTo(base);
 
 			e.change(function () {
-				if (isNaN(e.val())) {
-					// todo: show bad
-					return false;
-				}
 				socket.send('Change:' + base.data('key') + ';' + e.val());
 			});
 		},
@@ -22,10 +18,7 @@ require(['ws', 'namespace', 'widget'], function (ws, namespace, widget) {
 		update: function (element, value) {
 			var e = element.find('.widget-double');
 			e.val(value);
-		},
-
-		cols: 2,
-		rows: 1
+		}
 	});
 
 	widget.add('java.lang.Boolean', {
@@ -52,20 +45,47 @@ require(['ws', 'namespace', 'widget'], function (ws, namespace, widget) {
 			var check = (value == 'true');
 			var e = element.find('.widget-boolean');
 			e.css('background-color', check ? 'green' : 'red').html(check ? 'True' : 'False');
+		}
+	});
+	
+	widget.add('Boolean', {
+		init: function (base, settings) {
+			var e = $('<span class="widget-boolean">???</span>')
+				.css({
+					'width': '100%',
+					'font-family': 'monospace',
+					'font-size': '16px',
+					'color': 'white'
+				})
+				.appendTo(base);
 		},
 
-		cols: 2,
-		rows: 1
+		update: function (element, value) {
+			var check = (value == 'true');
+			var e = element.find('.widget-boolean');
+			e.css('background-color', check ? 'green' : 'red').html(check ? 'True' : 'False');
+		}
 	});
 
+	var draggable = false;
 	$('#drag-btn').click(function () {
-		/*grid.toggleMovable();
-
-		if (grid.isMovable()) {
-			$(this).html("Draggable/Resizable");
+		draggable = !draggable;
+		
+		if (draggable) {
+			$(".widget").draggable('enable');
+			$("#widgets").removeClass("nomove");
 		} else {
-			$(this).html("Not Draggable/Resizable");
-		}*/
+			$(".widget").draggable('disable');
+			$("#widgets").addClass("nomove");
+		}
+		
+		$(this).html(draggable ? "Dragging is On" : "Dragging is Off");
+		$(this).css("background-color", draggable ? "green" : "");
+	});
+	
+	$('#remove-all-widgets-btn').click(function () {
+		$('#widgets').empty();
+		createdWidgets = {};
 	});
 
 	var createdWidgets = {};
@@ -79,6 +99,7 @@ require(['ws', 'namespace', 'widget'], function (ws, namespace, widget) {
 			hideZeros: false,
 			hideExpanded: false
 		},
+		checkbox: true
 	});
 
 	tree = tree.fancytree('getTree').getRootNode();
@@ -161,6 +182,7 @@ require(['ws', 'namespace', 'widget'], function (ws, namespace, widget) {
 			
 			el.appendTo('#widgets').draggable({
 				snap: true,
+				disabled: true,
 				containment: 'parent'
 			}).resizable({
 				containment: 'parent'
@@ -174,7 +196,6 @@ require(['ws', 'namespace', 'widget'], function (ws, namespace, widget) {
 			w.find('.nettable-widget').html(value);
 
 		var no = getKeyTree(key, value);
-		console.log(no, no.data, no.data.caption);
 		no.data.caption = value;
 		no.renderTitle();
 

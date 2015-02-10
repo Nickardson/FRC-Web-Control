@@ -4,9 +4,28 @@ body {
     color: white;
 }
 
+#menu {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	height: 30px;
+	background-color: black;
+}
+
+#menu button {
+	height: 100%;
+	padding: 0px 10px 0px 10px;
+	cursor: pointer;
+	background-color: rgb(50, 50, 50);
+	border: 0px;
+	color: white;
+	margin-right: 5px;
+}
+
 #widgets {
 	position: absolute;
-	top: 20px;
+	top: 30px;
 	bottom: 0px;
 	left: 0px;
 	right: 25%;
@@ -14,10 +33,66 @@ body {
 
 #datatree-container {
 	position: absolute;
-	top: 20px;
+	top: 30px;
 	bottom: 0px;
 	width: 25%;
 	right: 0px;
+}
+
+#widgettray-container {
+	position: fixed;
+	width: 75%;
+	bottom: 0px;
+	left: 0px;
+	height: 130px;
+	background-color: black;
+}
+
+#widgettray {
+	height: 100%;
+	overflow-x: scroll;
+	overflow-y: hidden;
+	white-space: nowrap;
+}
+
+.widget-tray-item {
+	height: 100px;
+	width: 100px;
+	background-color: rgb(100, 100, 100);
+	margin: 5px;
+	display: inline-block;
+	vertical-align: top;
+	color: black;
+	position: relative;
+}
+
+.widget-tray-item:hover {
+	background-color: rgb(150, 150, 150);
+}
+
+.widget-tray-name {
+	pointer-events: none;
+	background-color: rgba(20, 20, 20, 0.5);
+	text-align: center;
+	color: white;
+	width: 100%;
+	position: absolute;
+}
+
+.widget-q:before {
+	content: "?";
+	font-size: 96px;
+	font-family: monospace;
+}
+.widget-q {
+	display: block;
+	height: 100%;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.widget-keyname {
+	cursor: default;
 }
 
 .widget {
@@ -27,6 +102,7 @@ body {
 }
 
 .widget-container {
+	padding: 5px;
 	background-color: #21475F;
 	box-shadow: 0 0 5px rgba(0,0,0,0.3);
 	overflow: hidden;
@@ -38,31 +114,36 @@ body {
 }
 
 /* Disable pointer events, i.e. click by default */
-.widget-container {
-	padding: 5px;
-	pointer-events: none;
+.widget {
 	white-space: nowrap;
-}
-
-.gridster>ul>li {
 	cursor: move;
 }
 
-/* When resize is disabled, enable pointer events */
-.gs-resize-disabled .widget-container {
-	pointer-events: inherit;
-	cursor: inherit;
+.widget-container {
+	pointer-events: none;
 }
 
-.gridster ul.gs-resize-disabled>li {
-	pointer-events: inherit;
+/* When resize is disabled, enable pointer events */
+.nomove .widget {
 	cursor: inherit;
+}
+.nomove .widget-container {
+	pointer-events: inherit;
 }
 
 .fancytree-ext-captioned-caption {
 	color: rgb(40, 40, 40);
 	font-style: italic;
 }
+
+/* Right aligned caption values
+.fancytree-ext-captioned-caption {
+	float: right;
+	display: inline;
+}
+.fancytree-title {
+	display: inline !important;
+}*/
 
 .fancytree-ext-captioned-sep:before {
 	content: " = ";

@@ -7,15 +7,23 @@
 		<link rel="stylesheet" href="css/style.css"/>
 	</head>
 	<body>
-		<button id="drag-btn">Not Draggable/Resizable</button>
-
-		<div id="widgets"></div>
+		<div id="menu">
+			<button id="drag-btn">Dragging is Off</button>
+			<button id="remove-all-widgets-btn">Remove All</button>
+		</div>
+		
+		<div id="widgets" class="nomove"></div>
+		<div id="widgettray-container">
+			<div id="widgettray">
+				<div class="widget-tray-item selected"><div class="widget-tray-name">Boolean</div><div class="widget-q"></div></div>
+				
+			</div>
+		</div>
 		<div id="datatree-container"><div id="datatree"></div></div>
 
 		<script src="js/jquery-1.11.2.min.js"></script>
 		<script src="js/jquery-ui.min.js"></script>
 		<script src="js/jquery.fancytree.min.js"></script>
-		<script src="js/jquery.fancytree.table.js"></script>
 		<script src="js/jquery.fancytree.captioned.js"></script>
 		<script data-main="js/main.js" src="js/require.min.js"></script>
 	</body>
